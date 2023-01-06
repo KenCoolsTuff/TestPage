@@ -1,24 +1,51 @@
-<br>
-<font size="1"><table class="xdebug-error xe-uncaught-exception" dir="ltr" border="1" cellspacing="0" cellpadding="1">
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Fatal error: Uncaught Error: Interface "Symfony\Component\CssSelector\Parser\ParserInterface" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Parser\Shortcut\ClassParser.php on line <i>29</i>
-</th></tr>
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Error: Interface "Symfony\Component\CssSelector\Parser\ParserInterface" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Parser\Shortcut\ClassParser.php on line <i>29</i>
-</th></tr>
-<tr><th align="left" bgcolor="#e9b96e" colspan="5">Call Stack</th></tr>
-<tr>
-<th align="center" bgcolor="#eeeeec">#</th>
-<th align="left" bgcolor="#eeeeec">Time</th>
-<th align="left" bgcolor="#eeeeec">Memory</th>
-<th align="left" bgcolor="#eeeeec">Function</th>
-<th align="left" bgcolor="#eeeeec">Location</th>
-</tr>
-<tr>
-<td bgcolor="#eeeeec" align="center">1</td>
-<td bgcolor="#eeeeec" align="center">0.0002</td>
-<td bgcolor="#eeeeec" align="right">360480</td>
-<td bgcolor="#eeeeec">{main}(  )</td>
-<td title="D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Parser\Shortcut\ClassParser.php" bgcolor="#eeeeec">...\ClassParser.php<b>:</b>0</td>
-</tr>
-</table></font>
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\CssSelector\Parser\Shortcut;
+
+use Symfony\Component\CssSelector\Node\ClassNode;
+use Symfony\Component\CssSelector\Node\ElementNode;
+use Symfony\Component\CssSelector\Node\SelectorNode;
+use Symfony\Component\CssSelector\Parser\ParserInterface;
+
+/**
+ * CSS selector class parser shortcut.
+ *
+ * This component is a port of the Python cssselect library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ *
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
+ */
+class ClassParser implements ParserInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function parse(string $source): array
+    {
+        // Matches an optional namespace, optional element, and required class
+        // $source = 'test|input.ab6bd_field';
+        // $matches = array (size=4)
+        //     0 => string 'test|input.ab6bd_field' (length=22)
+        //     1 => string 'test' (length=4)
+        //     2 => string 'input' (length=5)
+        //     3 => string 'ab6bd_field' (length=11)
+        if (preg_match('/^(?:([a-z]++)\|)?+([\w-]++|\*)?+\.([\w-]++)$/i', trim($source), $matches)) {
+            return [
+                new SelectorNode(new ClassNode(new ElementNode($matches[1] ?: null, $matches[2] ?: null), $matches[3])),
+            ];
+        }
+
+        return [];
+    }
+}

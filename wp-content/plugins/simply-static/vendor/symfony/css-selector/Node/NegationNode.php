@@ -1,24 +1,57 @@
-<br>
-<font size="1"><table class="xdebug-error xe-uncaught-exception" dir="ltr" border="1" cellspacing="0" cellpadding="1">
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Fatal error: Uncaught Error: Class "Symfony\Component\CssSelector\Node\AbstractNode" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Node\NegationNode.php on line <i>24</i>
-</th></tr>
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Error: Class "Symfony\Component\CssSelector\Node\AbstractNode" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Node\NegationNode.php on line <i>24</i>
-</th></tr>
-<tr><th align="left" bgcolor="#e9b96e" colspan="5">Call Stack</th></tr>
-<tr>
-<th align="center" bgcolor="#eeeeec">#</th>
-<th align="left" bgcolor="#eeeeec">Time</th>
-<th align="left" bgcolor="#eeeeec">Memory</th>
-<th align="left" bgcolor="#eeeeec">Function</th>
-<th align="left" bgcolor="#eeeeec">Location</th>
-</tr>
-<tr>
-<td bgcolor="#eeeeec" align="center">1</td>
-<td bgcolor="#eeeeec" align="center">0.0001</td>
-<td bgcolor="#eeeeec" align="right">360784</td>
-<td bgcolor="#eeeeec">{main}(  )</td>
-<td title="D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Node\NegationNode.php" bgcolor="#eeeeec">...\NegationNode.php<b>:</b>0</td>
-</tr>
-</table></font>
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\CssSelector\Node;
+
+/**
+ * Represents a "<selector>:not(<identifier>)" node.
+ *
+ * This component is a port of the Python cssselect library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ *
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
+ */
+class NegationNode extends AbstractNode
+{
+    private $selector;
+    private $subSelector;
+
+    public function __construct(NodeInterface $selector, NodeInterface $subSelector)
+    {
+        $this->selector = $selector;
+        $this->subSelector = $subSelector;
+    }
+
+    public function getSelector(): NodeInterface
+    {
+        return $this->selector;
+    }
+
+    public function getSubSelector(): NodeInterface
+    {
+        return $this->subSelector;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSpecificity(): Specificity
+    {
+        return $this->selector->getSpecificity()->plus($this->subSelector->getSpecificity());
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('%s[%s:not(%s)]', $this->getNodeName(), $this->selector, $this->subSelector);
+    }
+}

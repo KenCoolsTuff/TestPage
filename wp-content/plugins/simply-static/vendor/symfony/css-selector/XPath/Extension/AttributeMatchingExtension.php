@@ -1,24 +1,119 @@
-<br>
-<font size="1"><table class="xdebug-error xe-uncaught-exception" dir="ltr" border="1" cellspacing="0" cellpadding="1">
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Fatal error: Uncaught Error: Class "Symfony\Component\CssSelector\XPath\Extension\AbstractExtension" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\XPath\Extension\AttributeMatchingExtension.php on line <i>27</i>
-</th></tr>
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Error: Class "Symfony\Component\CssSelector\XPath\Extension\AbstractExtension" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\XPath\Extension\AttributeMatchingExtension.php on line <i>27</i>
-</th></tr>
-<tr><th align="left" bgcolor="#e9b96e" colspan="5">Call Stack</th></tr>
-<tr>
-<th align="center" bgcolor="#eeeeec">#</th>
-<th align="left" bgcolor="#eeeeec">Time</th>
-<th align="left" bgcolor="#eeeeec">Memory</th>
-<th align="left" bgcolor="#eeeeec">Function</th>
-<th align="left" bgcolor="#eeeeec">Location</th>
-</tr>
-<tr>
-<td bgcolor="#eeeeec" align="center">1</td>
-<td bgcolor="#eeeeec" align="center">0.0001</td>
-<td bgcolor="#eeeeec" align="right">360984</td>
-<td bgcolor="#eeeeec">{main}(  )</td>
-<td title="D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\XPath\Extension\AttributeMatchingExtension.php" bgcolor="#eeeeec">...\AttributeMatchingExtension.php<b>:</b>0</td>
-</tr>
-</table></font>
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\CssSelector\XPath\Extension;
+
+use Symfony\Component\CssSelector\XPath\Translator;
+use Symfony\Component\CssSelector\XPath\XPathExpr;
+
+/**
+ * XPath expression translator attribute extension.
+ *
+ * This component is a port of the Python cssselect library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ *
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
+ */
+class AttributeMatchingExtension extends AbstractExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttributeMatchingTranslators(): array
+    {
+        return [
+            'exists' => [$this, 'translateExists'],
+            '=' => [$this, 'translateEquals'],
+            '~=' => [$this, 'translateIncludes'],
+            '|=' => [$this, 'translateDashMatch'],
+            '^=' => [$this, 'translatePrefixMatch'],
+            '$=' => [$this, 'translateSuffixMatch'],
+            '*=' => [$this, 'translateSubstringMatch'],
+            '!=' => [$this, 'translateDifferent'],
+        ];
+    }
+
+    public function translateExists(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition($attribute);
+    }
+
+    public function translateEquals(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition(sprintf('%s = %s', $attribute, Translator::getXpathLiteral($value)));
+    }
+
+    public function translateIncludes(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition($value ? sprintf(
+            '%1$s and contains(concat(\' \', normalize-space(%1$s), \' \'), %2$s)',
+            $attribute,
+            Translator::getXpathLiteral(' '.$value.' ')
+        ) : '0');
+    }
+
+    public function translateDashMatch(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition(sprintf(
+            '%1$s and (%1$s = %2$s or starts-with(%1$s, %3$s))',
+            $attribute,
+            Translator::getXpathLiteral($value),
+            Translator::getXpathLiteral($value.'-')
+        ));
+    }
+
+    public function translatePrefixMatch(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition($value ? sprintf(
+            '%1$s and starts-with(%1$s, %2$s)',
+            $attribute,
+            Translator::getXpathLiteral($value)
+        ) : '0');
+    }
+
+    public function translateSuffixMatch(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition($value ? sprintf(
+            '%1$s and substring(%1$s, string-length(%1$s)-%2$s) = %3$s',
+            $attribute,
+            \strlen($value) - 1,
+            Translator::getXpathLiteral($value)
+        ) : '0');
+    }
+
+    public function translateSubstringMatch(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition($value ? sprintf(
+            '%1$s and contains(%1$s, %2$s)',
+            $attribute,
+            Translator::getXpathLiteral($value)
+        ) : '0');
+    }
+
+    public function translateDifferent(XPathExpr $xpath, string $attribute, ?string $value): XPathExpr
+    {
+        return $xpath->addCondition(sprintf(
+            $value ? 'not(%1$s) or %1$s != %2$s' : '%s != %s',
+            $attribute,
+            Translator::getXpathLiteral($value)
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return 'attribute-matching';
+    }
+}

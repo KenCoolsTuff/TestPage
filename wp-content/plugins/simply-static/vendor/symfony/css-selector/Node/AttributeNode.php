@@ -1,24 +1,82 @@
-<br>
-<font size="1"><table class="xdebug-error xe-uncaught-exception" dir="ltr" border="1" cellspacing="0" cellpadding="1">
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Fatal error: Uncaught Error: Class "Symfony\Component\CssSelector\Node\AbstractNode" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Node\AttributeNode.php on line <i>24</i>
-</th></tr>
-<tr><th align="left" bgcolor="#f57900" colspan="5">
-<span style="background-color: #cc0000; color: #fce94f; font-size: x-large;">( ! )</span> Error: Class "Symfony\Component\CssSelector\Node\AbstractNode" not found in D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Node\AttributeNode.php on line <i>24</i>
-</th></tr>
-<tr><th align="left" bgcolor="#e9b96e" colspan="5">Call Stack</th></tr>
-<tr>
-<th align="center" bgcolor="#eeeeec">#</th>
-<th align="left" bgcolor="#eeeeec">Time</th>
-<th align="left" bgcolor="#eeeeec">Memory</th>
-<th align="left" bgcolor="#eeeeec">Function</th>
-<th align="left" bgcolor="#eeeeec">Location</th>
-</tr>
-<tr>
-<td bgcolor="#eeeeec" align="center">1</td>
-<td bgcolor="#eeeeec" align="center">0.0001</td>
-<td bgcolor="#eeeeec" align="right">360832</td>
-<td bgcolor="#eeeeec">{main}(  )</td>
-<td title="D:\wamp64\www\TestPage\wp-content\plugins\simply-static\vendor\symfony\css-selector\Node\AttributeNode.php" bgcolor="#eeeeec">...\AttributeNode.php<b>:</b>0</td>
-</tr>
-</table></font>
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\CssSelector\Node;
+
+/**
+ * Represents a "<selector>[<namespace>|<attribute> <operator> <value>]" node.
+ *
+ * This component is a port of the Python cssselect library,
+ * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ *
+ * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
+ *
+ * @internal
+ */
+class AttributeNode extends AbstractNode
+{
+    private $selector;
+    private $namespace;
+    private $attribute;
+    private $operator;
+    private $value;
+
+    public function __construct(NodeInterface $selector, ?string $namespace, string $attribute, string $operator, ?string $value)
+    {
+        $this->selector = $selector;
+        $this->namespace = $namespace;
+        $this->attribute = $attribute;
+        $this->operator = $operator;
+        $this->value = $value;
+    }
+
+    public function getSelector(): NodeInterface
+    {
+        return $this->selector;
+    }
+
+    public function getNamespace(): ?string
+    {
+        return $this->namespace;
+    }
+
+    public function getAttribute(): string
+    {
+        return $this->attribute;
+    }
+
+    public function getOperator(): string
+    {
+        return $this->operator;
+    }
+
+    public function getValue(): ?string
+    {
+        return $this->value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSpecificity(): Specificity
+    {
+        return $this->selector->getSpecificity()->plus(new Specificity(0, 1, 0));
+    }
+
+    public function __toString(): string
+    {
+        $attribute = $this->namespace ? $this->namespace.'|'.$this->attribute : $this->attribute;
+
+        return 'exists' === $this->operator
+            ? sprintf('%s[%s[%s]]', $this->getNodeName(), $this->selector, $attribute)
+            : sprintf("%s[%s[%s %s '%s']]", $this->getNodeName(), $this->selector, $attribute, $this->operator, $this->value);
+    }
+}
