@@ -1,0 +1,133 @@
+/*banner-section*/
+.vw-church-banner-section{
+    width: auto;
+    height: auto;
+}
+.vw-church-banner-section a.wp-block-button__link {
+    padding: 12px 25px;
+    letter-spacing: 1px;
+    font-weight: bold;
+    font-size: 15px !important;
+}
+.vw-church-banner-section a.wp-block-button__link:hover{
+    background-color: #ffbd11 !important;
+    color: #121212 !important;
+}
+.vw-church-banner-section h1{
+    font-weight: bold;
+}
+/*events section*/
+.vw-church-events-section p{
+    font-weight: 500;
+    color:#121212;
+}
+.vw-church-events-section h2:after {
+    content: '';
+    width: 40px;
+    height: 3px;
+    background-color: #f26837;
+    display: block;
+    margin: 10px auto 0;
+}
+.vw-church-events-section-column{
+   position: relative;
+}
+.vw-church-events-section-column img{
+    width: 100%;
+}
+.vw-church-events-section-column p.has-text-align-center.date-section.has-text-color{
+    display: inline-block;
+    background-color: #ffbd11;
+    color: #121212;
+    padding: 10px;
+    position: absolute;
+    width: 60px;
+    line-height: 1;
+    border-radius: 3px 0 0 3px;
+    z-index: 99;
+    font-weight: bold;
+    top: 120px;
+    right: -8px;
+}
+.vw-church-events-section-column p.has-text-align-center.date-section.has-text-color:before {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 8px solid #d09600;
+    border-top: 8px solid transparent;
+    position: absolute;
+    right: 0;
+    top: -8px;
+}
+.vw-church-events-section-column h3{
+    position: absolute;
+    font-size: 22px;
+    width: 100%;
+    top: 200px;
+    color: #fff;
+    margin-left: 20px;
+}
+.vw-church-events-section-column p.addres-section.has-text-color:before {
+    font-family: 'Font Awesome 5 Free';
+    content: "\f124";
+    font-weight: 900;
+    padding: 10px;
+}
+.vw-church-events-section-column p.author-section:before {
+    content: "\f007";
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    padding: 10px;
+}
+.vw-church-events-section-column p.timing-section:before {
+    content: "\f017";
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    padding: 10px;
+}
+.vw-church-events-section-column p.author-section, .vw-church-events-section-column p.timing-section{
+    display: inline-block !important;
+}
+.vw-church-events-section-column p.timing-section{
+    line-height: 1;
+    border-left: 2px solid #141414;
+}
+.vw-church-events-section a.wp-block-button__link {
+    padding: 10px 25px !important;
+}
+.vw-church-events-section a.wp-block-button__link:hover {
+    background-color: #ffbd11 !important;
+    color: #121212 !important;
+}
+@media screen and (min-width: 320px) and (max-width: 767px){
+   .vw-church-events-section-column h3 {
+        top: 130px;
+    }
+    .vw-church-events-section-column p.has-text-align-center.date-section.has-text-color{
+        top: 100px;
+    }
+    .vw-church-banner-section h1{
+        font-size: 43px !important;
+    }
+}
+@media screen and (min-width: 768px) and (max-width: 991px){
+    .wp-block-columns.vw-church-events-coloumsection{
+        flex-wrap: nowrap !important;
+    }
+    .vw-church-events-section-column p.has-text-align-center.date-section.has-text-color{
+        top: 47px;
+    }
+    .vw-church-events-section-column h3 {
+        font-size: 16px !important;
+        top: 100px;
+        margin-left: 10px !important;
+    }
+}
+@media screen and (max-width: 1024px) and (min-width: 1000px) {
+    .vw-church-events-section-column h3{
+        top: 132px !important; 
+    }   
+    .vw-church-events-section-column p.has-text-align-center.date-section.has-text-color{
+        top: 86px !important;
+    }
+}
